@@ -2,7 +2,7 @@ name: CI Deploy
 
 on:
   pull_request:
-    types: [closed]
+    #types: [closed]
     branches:
       - master
       
