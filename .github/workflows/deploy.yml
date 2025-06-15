@@ -66,6 +66,10 @@ jobs:
       #    HARDHAT_IGNITION_CONFIRM_DEPLOYMENT: "false"
       #  run: npx hardhat ignition deploy ./ignition/modules/Apollo.js --network geth
 
+      - name: Stop Geth Container Gracefully
+        run: |
+          docker stop dev-geth
+
       - name: Make geth-data world-readable
         run: sudo chmod -R a+rx ./geth-data && ls -lah geth-data
 
