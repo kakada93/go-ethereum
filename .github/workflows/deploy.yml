@@ -60,7 +60,7 @@ jobs:
         run: npx hardhat ignition deploy ./ignition/modules/Lock.js --network geth
 
       - name: Make geth-data world-readable
-        run: chmod -R a+rx ./geth-data && ls -lah geth-data
+        run: sudo chmod -R a+rx ./geth-data && ls -lah geth-data
 
       - name: Build Docker image with deployed contracts
         run: |
