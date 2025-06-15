@@ -32,7 +32,7 @@ jobs:
       - name: Run geth container
         run: |
           docker run -d --name dev-geth \
-            -v ${{ github.workspace }}/geth-data:/root/.ethereum \
+            -v ./geth-data:/root/.ethereum \
             -p 8545:8545 \
             ${{ secrets.DOCKERHUB_USERNAME }}/go-ethereum:latest \
             --dev \
