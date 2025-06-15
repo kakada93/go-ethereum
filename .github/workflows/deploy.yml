@@ -1,0 +1,69 @@
+name: CI Deploy
+
+on:
+  pull_request:
+    types: [closed]
+    branches:
+      - master
+      
+    #paths:
+    #  - 'hardhat/**'
+    #  - 'docker-compose.yml'
+
+jobs:
+  deploy:
+    if: contains(github.event.pull_request.labels.*.name, 'CI:Deploy')
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Set up Docker Compose
+        run: |
+          docker-compose --version
+
+      - name: Create bind mount dir
+        run: mkdir -p geth-data
+
+      - name: Run geth container
+        run: |
+          docker run -d --name dev-geth \
+            -v ${{ github.workspace }}/geth-data:/root/.ethereum \
+            -p 8545:8545 \
+            bdimitrov93/go-ethereum:latest \
+            --dev \
+            --http \
+            --http.api eth,net,web3 \
+            --http.addr 0.0.0.0 \
+            --http.corsdomain "*" \
+            --datadir=/root/.ethereum
+
+      - name: Wait for Geth to be ready
+        run: sleep 10
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Install Hardhat dependencies
+        working-directory: ./hardhat
+        run: npm install
+
+      - name: Deploy contracts to devnet
+        working-directory: ./hardhat
+        env:
+          HARDHAT_IGNITION_CONFIRM_DEPLOYMENT: "false"
+        run: npx hardhat ignition deploy ./ignition/modules/Lock.js --network geth
+      
+      - name: Build Docker image with deployed contracts
+        run: |
+          docker build  -f Dockerfile.contracts -t bdimitrov93/go-ethereum:withcontracts 
+
+      - name: Log in to DockerHub
+        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+
+      - name: Push image to DockerHub
+        run: docker push bdimitrov93/go-ethereum:withcontracts 
+
