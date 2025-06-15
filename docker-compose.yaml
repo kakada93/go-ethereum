@@ -1,0 +1,26 @@
+services:
+  geth:
+    image: bdimitrov93/go-ethereum:latest 
+    container_name: geth
+    command:
+    - --dev 
+    - --http 
+    - --http.api=eth,web3,net,miner,debug
+    - --http.addr=0.0.0.0
+    - --http.port=8545 
+    - --http.corsdomain='*'
+    - --datadir=/root/.ethereum
+    ports:
+      - "8545:8545"    
+      - "30303:30303"  
+    volumes:
+      - ./geth-data:/root/.ethereum
+    networks:
+      - gethnet
+
+#volumes:
+#  geth-data:
+
+networks:
+  gethnet:
+
