@@ -58,7 +58,10 @@ jobs:
         env:
           HARDHAT_IGNITION_CONFIRM_DEPLOYMENT: "false"
         run: npx hardhat ignition deploy ./ignition/modules/Lock.js --network geth
-      
+
+      - name: Make geth-data world-readable
+        run: chmod -R a+rx ./geth-data && ls -lah geth-data
+
       - name: Build Docker image with deployed contracts
         run: |
           docker build -f Dockerfile.contracts -t ${{ secrets.DOCKERHUB_USERNAME }}/go-ethereum:withcontracts .
