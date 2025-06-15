@@ -33,7 +33,7 @@ jobs:
           docker run -d --name dev-geth \
             -v ${{ github.workspace }}/geth-data:/root/.ethereum \
             -p 8545:8545 \
-            bdimitrov93/go-ethereum:latest \
+            ${{ secrets.DOCKERHUB_USERNAME }}/go-ethereum:latest \
             --dev \
             --http \
             --http.api eth,net,web3 \
@@ -42,7 +42,7 @@ jobs:
             --datadir=/root/.ethereum
 
       - name: Wait for Geth to be ready
-        run: sleep 10
+        run: sleep 3
 
       - name: Setup Node.js
         uses: actions/setup-node@v3
@@ -61,8 +61,8 @@ jobs:
       
       - name: Build Docker image with deployed contracts
         run: |
-          docker build  -f Dockerfile.contracts -t bdimitrov93/go-ethereum:withcontracts 
+          docker build -f Dockerfile.contracts -t ${{ secrets.DOCKERHUB_USERNAME }}/go-ethereum:withcontracts .
 
       - name: Push image to DockerHub
-        run: docker push bdimitrov93/go-ethereum:withcontracts 
+        run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/go-ethereum:withcontracts 
 
