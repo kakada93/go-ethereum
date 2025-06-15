@@ -2,10 +2,11 @@ name: CI Build and Push
 
 on:
   pull_request:
-    types: [closed]
+    #types: [closed]
     branches:
       - master
-
+  workflow_dispatch:
+  
 jobs:
   build_and_push:
     if: github.event.pull_request.merged == true && contains(github.event.pull_request.labels.*.name, 'CI:Build')

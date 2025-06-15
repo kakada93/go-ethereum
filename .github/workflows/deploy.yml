@@ -9,7 +9,8 @@ on:
     #paths:
     #  - 'hardhat/**'
     #  - 'docker-compose.yml'
-
+  workflow_dispatch:
+  
 jobs:
   deploy:
     if: contains(github.event.pull_request.labels.*.name, 'CI:Deploy')
@@ -58,6 +59,12 @@ jobs:
         env:
           HARDHAT_IGNITION_CONFIRM_DEPLOYMENT: "false"
         run: npx hardhat ignition deploy ./ignition/modules/Lock.js --network geth
+
+      - name: Deploy contracts to devnet
+        working-directory: ./hardhat
+        env:
+          HARDHAT_IGNITION_CONFIRM_DEPLOYMENT: "false"
+        run: npx hardhat ignition deploy ./ignition/modules/Rocket.js --network geth
 
       - name: Make geth-data world-readable
         run: sudo chmod -R a+rx ./geth-data && ls -lah geth-data
