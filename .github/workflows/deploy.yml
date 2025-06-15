@@ -27,7 +27,7 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Create bind mount dir
-        run: mkdir -p geth-data
+        run: mkdir -p geth-data && ls -lah geth-data
 
       - name: Run geth container
         run: |
@@ -60,11 +60,11 @@ jobs:
           HARDHAT_IGNITION_CONFIRM_DEPLOYMENT: "false"
         run: npx hardhat ignition deploy ./ignition/modules/Lock.js --network geth
 
-      - name: Deploy contracts to devnet
-        working-directory: ./hardhat
-        env:
-          HARDHAT_IGNITION_CONFIRM_DEPLOYMENT: "false"
-        run: npx hardhat ignition deploy ./ignition/modules/Apollo.js --network geth
+      #- name: Deploy contracts to devnet
+      #  working-directory: ./hardhat
+      #  env:
+      #    HARDHAT_IGNITION_CONFIRM_DEPLOYMENT: "false"
+      #  run: npx hardhat ignition deploy ./ignition/modules/Apollo.js --network geth
 
       - name: Make geth-data world-readable
         run: sudo chmod -R a+rx ./geth-data && ls -lah geth-data
