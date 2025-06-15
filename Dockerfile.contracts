@@ -1,6 +1,6 @@
 FROM bdimitrov93/go-ethereum:latest 
 
-COPY geth-data /root/.ethereum
+ADD ./geth-data /root/.ethereum
 
 EXPOSE 8545  30303
 
