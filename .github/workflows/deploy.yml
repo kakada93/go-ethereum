@@ -60,11 +60,11 @@ jobs:
           HARDHAT_IGNITION_CONFIRM_DEPLOYMENT: "false"
         run: npx hardhat ignition deploy ./ignition/modules/Lock.js --network geth
 
-      #- name: Deploy contracts to devnet
-      #  working-directory: ./hardhat
-      #  env:
-      #    HARDHAT_IGNITION_CONFIRM_DEPLOYMENT: "false"
-      #  run: npx hardhat ignition deploy ./ignition/modules/Apollo.js --network geth
+      - name: Deploy contracts to devnet
+        working-directory: ./hardhat
+        env:
+          HARDHAT_IGNITION_CONFIRM_DEPLOYMENT: "false"
+        run: npx hardhat ignition deploy ./ignition/modules/Apollo.js --network geth
 
       - name: Stop Geth Container Gracefully
         run: |
@@ -80,3 +80,45 @@ jobs:
       - name: Push image to DockerHub
         run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/go-ethereum:withcontracts 
 
+
+  test-contracts:
+    runs-on: ubuntu-latest
+
+    services:
+      geth:
+        image: ${{ secrets.DOCKERHUB_USERNAME }}/go-ethereum:withcontracts
+        ports:
+          - 8545:8545
+        options: >-
+          --health-cmd "curl --fail http://localhost:8545 || exit 1"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        command: >
+          --dev
+          --http
+          --http.addr 0.0.0.0
+          --http.api eth,net,web3,personal
+          --http.corsdomain "*"
+          --http.vhosts "*"
+          --datadir=/root/.ethereum
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Install deps
+        run: npm ci
+
+      - name: Compile contracts
+        run: npx hardhat compile
+
+      - name: Run Hardhat tests against Geth
+        #env:
+        #  PRIVATE_KEY: ${{ secrets.TEST_PRIVATE_KEY }}
+        run: npx hardhat test --network geth
