@@ -84,26 +84,27 @@ jobs:
   test-contracts:
     runs-on: ubuntu-latest
 
-    services:
-      geth:
-        image: ${{ secrets.DOCKERHUB_USERNAME }}/go-ethereum:withcontracts
-        ports:
-          - 8545:8545
-        options: >-
-          --health-cmd "curl --fail http://localhost:8545 || exit 1"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-        command: >
-          --dev
-          --http
-          --http.addr 0.0.0.0
-          --http.api eth,net,web3,personal
-          --http.corsdomain "*"
-          --http.vhosts "*"
-          --datadir=/root/.ethereum
 
     steps:
+
+      - name: Log in to DockerHub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Run geth container
+        run: |
+          docker run -d --name dev-geth \
+            -p 8545:8545 \
+            ${{ secrets.DOCKERHUB_USERNAME }}/go-ethereum:withcontracts \
+            --dev \
+            --http \
+            --http.api eth,net,web3 \
+            --http.addr 0.0.0.0 \
+            --http.corsdomain "*" \
+            --datadir=/root/.ethereum
+
       - name: Checkout repo
         uses: actions/checkout@v3
 
