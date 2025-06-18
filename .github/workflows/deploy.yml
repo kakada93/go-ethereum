@@ -82,6 +82,7 @@ jobs:
 
 
   test-contracts:
+    needs: deploy
     runs-on: ubuntu-latest
 
 
@@ -114,12 +115,15 @@ jobs:
           node-version: 18
 
       - name: Install deps
+        working-directory: ./hardhat
         run: npm ci
 
       - name: Compile contracts
+        working-directory: ./hardhat
         run: npx hardhat compile
 
       - name: Run Hardhat tests against Geth
+        working-directory: ./hardhat
         #env:
         #  PRIVATE_KEY: ${{ secrets.TEST_PRIVATE_KEY }}
         run: npx hardhat test --network geth
