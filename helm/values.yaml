@@ -1,0 +1,20 @@
+appId: "geth-dev"
+replicaCount: 1
+
+image:
+  repository: bdimitrov93/go-ethereum
+  tag: withcontracts
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 8545
+
+resources: {}
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: []
+

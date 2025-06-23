@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.appId }}
+  labels:
+    app: {{ .Values.appId }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ .Values.appId }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.appId }}
+    spec:
+      containers:
+        - name: geth
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          args:
+            - "--http"
+            - "--http.addr=0.0.0.0"
+            - "--http.api=eth,net,web3,personal"
+            - "--http.corsdomain=*"
+            - "--http.vhosts=*"
+            - "--nodiscover"
+          ports:
+            - containerPort: 8545
+              name: rpc
+
